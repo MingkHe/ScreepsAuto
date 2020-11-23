@@ -1,7 +1,6 @@
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
-var roleRepairer = require('role.repairer');
 var roleFiller = require('role.filler');
 var strucTower = require('struc.tower');
 
@@ -21,10 +20,10 @@ module.exports.loop = function () {
         filter: (structure) => structure.structureType == STRUCTURE_TOWER
     });
 
-    strucTower.run(towers[0])
-    // for (var tower in towers){
-    //     strucTower.run(tower);
-    // }
+    // strucTower.run(towers[0])
+    for (var key in towers){
+        strucTower.run(towers[key]);
+    }
 
     for(var name in Memory.creeps) {
         if(!Game.creeps[name]) {
@@ -63,37 +62,41 @@ module.exports.loop = function () {
         }
     }
 
-    if (numOfHarverster < 3) {
+    if (numOfHarverster < 4) {
         let name = "harvester" + Game.time;
         Game.spawns['TownHall'].spawnCreep(
-            [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
+            [WORK, WORK, WORK, CARRY,CARRY, CARRY, MOVE,MOVE, MOVE],
             name,
             {memory: {role: "harvester", status: "harvest"}}
         ); 
     }
-    if (numOfUpgrader < 2) {
-        let name = "upgrader" + Game.time;
-        Game.spawns['TownHall'].spawnCreep(
-            [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
-            name,
-            {memory: {role: "upgrader", status: "upgrader"}}
-        );
+    if (numOfHarverster == 4) {
+        if (numOfUpgrader < 2) {
+            let name = "upgrader" + Game.time;
+            Game.spawns['TownHall'].spawnCreep(
+                [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
+                name,
+                {memory: {role: "upgrader", status: "upgrader"}}
+            );
+        }
+        if (numOfBuilder < 2) {
+            let name = "builder" + Game.time;
+            Game.spawns['TownHall'].spawnCreep(
+                [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
+                name,
+                {memory: {role: "builder", status: "builder"}}
+            ); 
+        }
+        if (numOfFiller < 1 && myRoom.storage.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+            let name = "filler" + Game.time;
+            Game.spawns['TownHall'].spawnCreep(
+                [WORK, WORK, CARRY, CARRY, MOVE, MOVE],
+                name,
+                {memory: {role: "filler", status: "filler"}}
+            );         
+        }
+        
     }
-    if (numOfBuilder < 2) {
-        let name = "builder" + Game.time;
-        Game.spawns['TownHall'].spawnCreep(
-            [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE],
-            name,
-            {memory: {role: "builder", status: "builder"}}
-        ); 
-    }
-    if (numOfFiller < 1 && myRoom.storage.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
-        let name = "filler" + Game.time;
-        Game.spawns['TownHall'].spawnCreep(
-            [WORK, WORK, CARRY, CARRY, MOVE, MOVE],
-            name,
-            {memory: {role: "filler", status: "filler"}}
-        );         
-    }
+
     
 }
